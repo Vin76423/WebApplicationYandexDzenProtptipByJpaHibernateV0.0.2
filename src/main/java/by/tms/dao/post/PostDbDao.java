@@ -7,6 +7,7 @@ import by.tms.entity.SearchParameters;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +59,12 @@ public class PostDbDao implements PostDao {
 
         if (nonNull(searchParameters.getTitle())) {
             query.where(criteriaBuilder.equal(postRoot.get("title"), searchParameters.getTitle()));
+
+//            query.where(criteriaBuilder.like(postRoot.get("title"), "Ti%"));
+
+//            query.where(criteriaBuilder.in(postRoot.get("title"))
+//                                       .value(searchParameters.getTitle())
+//                                       .value("other title"));
         }
         //TODO: can add other criteria: if (..) { query.where(..) }
 
@@ -81,6 +88,23 @@ public class PostDbDao implements PostDao {
             throw new IllegalArgumentException("Post is null!");
         }
         entityManager.merge(post);
+    }
+
+    /**
+     * Criteria in JPA example (update):
+     * @return amount of modified records.
+     */
+    @Override
+    public int updateMessageByTitle(String title) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        CriteriaUpdate<Post> update = criteriaBuilder.createCriteriaUpdate(Post.class);
+        Root<Post> updatePostRoot = update.from(Post.class);
+
+        update.where(criteriaBuilder.equal(updatePostRoot.get("title"), title))
+              .set("massage", "Some new message!");
+
+        return entityManager.createQuery(update).executeUpdate();
     }
 
     @Override

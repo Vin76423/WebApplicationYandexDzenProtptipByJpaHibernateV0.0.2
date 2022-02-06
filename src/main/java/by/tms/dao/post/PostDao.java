@@ -19,6 +19,8 @@ public interface PostDao {
 
     void updatePost(Post post);
 
+    int updateMessageByTitle(String title);
+
     void deletePost(long postId);
 
     boolean existPostByTitle(String title);
