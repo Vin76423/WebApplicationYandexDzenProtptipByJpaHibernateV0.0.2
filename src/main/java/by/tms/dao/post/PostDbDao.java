@@ -57,6 +57,11 @@ public class PostDbDao implements PostDao {
         CriteriaQuery<Post> query = criteriaBuilder.createQuery(Post.class);
         Root<Post> postRoot = query.from(Post.class);
 
+//        TODO: can do select in one line:
+//        CriteriaQuery<Post> selectCriteriaQuery = query.select(postRoot)
+//                                                       .where(criteriaBuilder.equal(postRoot.get("title"), searchParameters.getTitle()));
+
+//        TODO: or dynamic add new predicate-expressions:
         if (nonNull(searchParameters.getTitle())) {
             query.where(criteriaBuilder.equal(postRoot.get("title"), searchParameters.getTitle()));
 
@@ -66,6 +71,7 @@ public class PostDbDao implements PostDao {
 //                                       .value(searchParameters.getTitle())
 //                                       .value("other title"));
         }
+
         //TODO: can add other criteria: if (..) { query.where(..) }
 
         CriteriaQuery<Post> selectCriteriaQuery = query.select(postRoot);
