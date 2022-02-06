@@ -1,6 +1,13 @@
 package by.tms.dao.post;
 
+import static java.util.Objects.nonNull;
+
 import by.tms.entity.Post;
+import by.tms.entity.SearchParameters;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
@@ -39,7 +46,26 @@ public class PostDbDao implements PostDao {
         return entityManager.find(Post.class, postId);
     }
 
+    /**
+     * Criteria in JPA example:
+     */
+    @Override
+    public List<Post> getPostsByParameters(SearchParameters searchParameters) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 
+        CriteriaQuery<Post> query = criteriaBuilder.createQuery(Post.class);
+        Root<Post> postRoot = query.from(Post.class);
+
+        if (nonNull(searchParameters.getTitle())) {
+            query.where(criteriaBuilder.equal(postRoot.get("title"), searchParameters.getTitle()));
+        }
+        //TODO: can add other criteria: if (..) { query.where(..) }
+
+        CriteriaQuery<Post> selectCriteriaQuery = query.select(postRoot);
+
+        TypedQuery<Post> result = entityManager.createQuery(selectCriteriaQuery);
+        return result.getResultList();
+    }
 
     @Override
     public void createPost(Post post) {
